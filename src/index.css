@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Poetsen+One&family=Roboto+Slab:wght@100..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  [multiple],
+  textarea,
+  select {
+    @apply block w-full rounded-md border-none bg-gray-100 focus:ring-0;
+  }
+
+  td:last-child,
+  th:last-child {
+    @apply px-0;
+  }
+
+  td:first-child,
+  th:first-child {
+    @apply pl-0;
+  }
+
+  td,
+  th {
+    @apply p-1 md:p-1.5;
+  }
+
+  body {
+    @apply font-sans;
+  }
+}
+
+.customFont{
+  font-family: "Poetsen One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+
+}
