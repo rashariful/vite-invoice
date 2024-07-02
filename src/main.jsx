@@ -11,11 +11,12 @@ import {
 } from "react-router-dom";
 import AllInvoices from './components/invoices/AllInvoice.jsx';
 import InvoiceFileUpload from './components/InvoiceFileUpload.jsx';
+import { Toaster } from 'react-hot-toast';
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    children:[
+    children: [
       {
         path: '/',
         element: <InvoiceForm />
@@ -36,10 +37,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
       <RouterProvider router={router} />
+      <Toaster />
     </Provider>
   </React.StrictMode>,
 )
 
 
 
-          

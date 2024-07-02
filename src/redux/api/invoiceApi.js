@@ -50,7 +50,17 @@ const invoiceApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["invoice"],
     }),
-
+    createInvoiceWithXLSX: builder.mutation({
+      query: (data) => {
+        return {
+          url: "/invoice/xl",
+          method: "POST",
+          body: data,
+          contentType: "multipart/form-data",
+        };
+      },
+      invalidatesTags: ["invoice"],
+    }),
     deleteInvoice: builder.mutation({
       query: (id) => ({
         url: `/invoice/${id}`,
@@ -65,6 +75,7 @@ export const {
   useCreateinvoiceMutation,
   useGetAllInvoiceQuery,
   useGetSingleInvoiceQuery,
+  useCreateInvoiceWithXLSXMutation,
   useUpdateInvoiceMutation,
   useDeleteInvoiceMutation,
 } = invoiceApi;

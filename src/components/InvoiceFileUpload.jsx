@@ -1,33 +1,41 @@
 import { useState } from "react";
+import { useCreateInvoiceWithXLSXMutation } from "../redux/api/invoiceApi";
+import toast from "react-hot-toast";
 
 const InvoiceFileUpload = () => {
+  const [createInvoiceWithXLSX] = useCreateInvoiceWithXLSXMutation();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
   const [data, setData] = useState();
+
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
     setIsFileUploaded(false); // Reset upload status when file changes
   };
 
-  const handleFileUpload = () => {
+  const handleFileUpload = async () => {
     if (!selectedFile) {
       console.error("No file selected.");
       return;
     }
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      const res = await createInvoiceWithXLSX(formData);
+      console.log(res);
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    fetch("http://localhost:4000/api/v1/xltjson", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data);
-      })
-      .catch((error) => console.error("Error uploading file:", error));
+      if (res.error) {
+        toast.error("File upload failed!");
+      } else {
+        toast.success("File uploaded successfully!");
+        setData(res.data);
+        setIsFileUploaded(true);
+      }
+    } catch (error) {
+      console.error("Error uploading file: ", error);
+      toast.error("File upload failed!");
+    }
   };
 
   return (
