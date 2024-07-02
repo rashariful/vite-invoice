@@ -11,6 +11,7 @@ import {
   useCreateinvoiceMutation,
   useGetAllInvoiceQuery,
 } from "../redux/api/invoiceApi";
+import { useGetAllShopQuery } from "../redux/api/shopApi";
 
 const InvoiceModal = ({
   isOpen,
@@ -22,27 +23,31 @@ const InvoiceModal = ({
   function closeModal() {
     setIsOpen(false);
   }
+  const { data: shopData } = useGetAllShopQuery(undefined);
   const [createInvoice] = useCreateinvoiceMutation();
-
-  console.log("form 24", invoiceInfo.cashierInfo?.name);
   const info = {
-    cashier_name: invoiceInfo.cashierInfo?.name || invoiceInfo.cashier_name,
-    customer_name: invoiceInfo.customer_name,
-    customer_phone: invoiceInfo.customer_phone,
-    customer_address: invoiceInfo.customer_address,
-    delivery_charge: invoiceInfo.delivery_charge,
-    paid_amount: invoiceInfo.paid_amount,
-    note: invoiceInfo.note,
-    subTotal: invoiceInfo.subTotal,
-    total: invoiceInfo.total,
-    due: invoiceInfo.due,
-    items: items,
+    shop: shopData?.data?.find((shop) => shop.name === invoiceInfo?.shop?.name)
+      ?._id,
+    customer: {
+      name: invoiceInfo?.customerName,
+      contactNo: invoiceInfo?.customerContactNo,
+      address: invoiceInfo?.customerAddress,
+    },
+    deliveryCharge: invoiceInfo?.deliveryCharge,
+    subTotal: invoiceInfo?.subTotal,
+    paidAmount: invoiceInfo?.paidAmount,
+    note: invoiceInfo?.note,
+    due: invoiceInfo?.due,
+    grandTotal: invoiceInfo?.grandTotal,
+    products: items,
   };
-  // console.log(info)
+
   const { refetch } = useGetAllInvoiceQuery();
   const addNextInvoiceHandler = async () => {
     try {
+      console.log(info);
       const response = await createInvoice(info);
+      console.log(response, "response");
       if (response.data.success === true) {
         refetch();
         setIsOpen(false);
@@ -132,8 +137,6 @@ const InvoiceModal = ({
     onAfterPrint: () => console.log("after printing..."),
     removeAfterPrint: true,
   });
-
-  console.log("134 invoice modal: ", invoiceInfo?.orderId || null);
 
   return (
     <Transition appear show={isOpen} as={Fragment}>

@@ -6,6 +6,7 @@ import { useGetAllInvoiceQuery } from "../redux/api/invoiceApi";
 import icchaporon from "../../src/img/logo-ip.png";
 import ifashion from "../../src/img/I Fashion Logo.png";
 import mi from "../../src/img/images.png";
+import { useGetAllShopQuery } from "../redux/api/shopApi";
 const date = new Date();
 const today = date.toLocaleDateString("en-GB", {
   month: "numeric",
@@ -23,27 +24,27 @@ const InvoiceForm = () => {
       setInvoices(allData.data);
     }
   }, [allData]);
-
   // Extract last orderId
-  const orderId =
-    invoices.length > 0
-      ? parseInt(invoices[invoices.length - 1].orderId) + 1
-      : 1;
-
+  const orderId = parseInt(invoices[0]?.orderId) + 1;
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [note, setNote] = useState("");
-  const [deliveryCharge, setDeliveryCharge] = useState("");
+  const [deliveryAmount, setDeliveryAmount] = useState("");
   const [paid, setPaid] = useState("");
-  const [cashierInfo, setCashierInfo] = useState({
-    name: "icchaporon.com",
-    image: "/src/img/logo-ip.png",
-    address:
-      "<p >Shop no 9/B (2nd Floor)</p><p>BTI Premier Plaza Shopping mall</p><p>North Badda, Dhaka 1212</p>",
+  const {
+    data: shops,
+    isLoading: isShopLoading,
+    isFetching: isShopFetching,
+  } = useGetAllShopQuery(undefined);
+
+  const [shop, setShop] = useState({
+    name: shops?.data[0]?.name,
+    image: shops?.data[0]?.image,
+    address: shops?.data[0]?.address,
   });
-  const [customer_name, setCustomer_name] = useState("");
-  const [customer_phone, setCustomer_phone] = useState("");
-  const [customer_address, setCustomer_address] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerContactNo, setCustomerContactNo] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
 
   const [items, setItems] = useState([
     {
@@ -55,7 +56,6 @@ const InvoiceForm = () => {
     },
   ]);
 
-  console.log("51 form", cashierInfo);
   const { isloading } = useGetAllInvoiceQuery();
 
   const toggleVisibility = () => {
@@ -82,9 +82,9 @@ const InvoiceForm = () => {
   };
 
   const addNextInvoiceHandler = () => {
-    setCustomer_name("");
-    setCustomer_phone("");
-    setCustomer_address("");
+    setCustomerName("");
+    setCustomerContactNo("");
+    setCustomerAddress("");
     setItems([
       {
         id: uid(6),
@@ -131,10 +131,12 @@ const InvoiceForm = () => {
     else return prev;
   }, 0);
 
-  const delivery_charge = parseInt(deliveryCharge);
-  const paid_amount = parseInt(paid);
-  const total = isNaN(delivery_charge) ? subTotal : subTotal + delivery_charge;
-  const due = isNaN(paid_amount) ? total : total - paid_amount;
+  const deliveryCharge = parseInt(deliveryAmount);
+  const paidAmount = parseInt(paid);
+  const grandTotal = isNaN(deliveryCharge)
+    ? subTotal
+    : subTotal + deliveryCharge;
+  const due = isNaN(paidAmount) ? grandTotal : grandTotal - paidAmount;
 
   if (isloading || allInvoiceLoading) {
     return <p>loading...</p>;
@@ -184,7 +186,7 @@ const InvoiceForm = () => {
                 required
                 id="cashierName"
                 className="bg-slate-100 p-2 rounded-md"
-                value={cashierInfo.name}
+                value={shop.name}
                 onChange={(event) => {
                   const selectedOption =
                     event.target.options[event.target.selectedIndex];
@@ -193,7 +195,7 @@ const InvoiceForm = () => {
                     selectedOption.getAttribute("data-image");
                   const selectedAddress =
                     selectedOption.getAttribute("data-address");
-                  setCashierInfo({
+                  setShop({
                     name: selectedValue,
                     image: selectedImage,
                     address: selectedAddress,
@@ -201,35 +203,16 @@ const InvoiceForm = () => {
                 }}
               >
                 <option disabled>Select a store</option>
-                <option
-                  value="icchaporon.com"
-                  data-image={icchaporon}
-                  data-address="<p >Shop no 9/B (2nd Floor)</p>
-                <p>BTI Premier Plaza Shopping mall</p>
-                <p>North Badda, Dhaka 1212</p>
-                "
-                >
-                  icchaporon
-                </option>
-                <option
-                  value="I fashion"
-                  data-image={ifashion}
-                  data-address="<p className='text-xs'>Shop no 9/B (2nd Floor)</p>
-                <p className='text-xs font-bold'>BTI Premier Plaza Shopping mall</p>
-                <p className='text-xs'>North Badda, Dhaka 1212</p>
-                "
-                >
-                  I Fashion
-                </option>
-                <option
-                  value="Mi Official Store"
-                  data-image={mi}
-                  data-address="<p className='text-xs'>4/119 Suvastu Nazer Valley Shopping Mahal</p>
-                <p className='text-xs'>Shahazadpur, Dhaka 1212</p>
-                "
-                >
-                  Mi Official Store
-                </option>
+                {shops?.data.map((shop) => (
+                  <option
+                    key={shop.id}
+                    value={shop.name}
+                    data-image={shop.image}
+                    data-address={shop.address}
+                  >
+                    {shop.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -245,8 +228,8 @@ const InvoiceForm = () => {
                 type="text"
                 name="customerName"
                 id="customerName"
-                value={customer_name}
-                onChange={(event) => setCustomer_name(event.target.value)}
+                value={customerName}
+                onChange={(event) => setCustomerName(event.target.value)}
               />
             </div>
             <div>
@@ -262,8 +245,8 @@ const InvoiceForm = () => {
                 type="number"
                 name="customerName"
                 id="customerName"
-                value={customer_phone}
-                onChange={(event) => setCustomer_phone(event.target.value)}
+                value={customerContactNo}
+                onChange={(event) => setCustomerContactNo(event.target.value)}
               />
             </div>
             <div>
@@ -279,8 +262,8 @@ const InvoiceForm = () => {
                 type="text"
                 name="customerName"
                 id="customerName"
-                value={customer_address}
-                onChange={(event) => setCustomer_address(event.target.value)}
+                value={customerAddress}
+                onChange={(event) => setCustomerAddress(event.target.value)}
               />
             </div>
           </div>
@@ -324,20 +307,22 @@ const InvoiceForm = () => {
               <span className="font-bold">Delivery Charge:</span>
               <span>
                 Tk.{" "}
-                {isNaN(delivery_charge)
+                {isNaN(deliveryCharge)
                   ? "0.00"
-                  : delivery_charge.toFixed(2) || "0.00"}
+                  : deliveryCharge.toFixed(2) || "0.00"}
               </span>
             </div>
             <div className="flex w-full justify-between md:w-1/2">
               <span className="font-bold">Total:</span>
-              <span>Tk. {isNaN(total) ? "0.00" : total.toFixed(2)}</span>
+              <span>
+                Tk. {isNaN(grandTotal) ? "0.00" : grandTotal.toFixed(2)}
+              </span>
             </div>
             <div className="flex w-full justify-between md:w-1/2">
               <span className="font-bold">Paid Amount:</span>
               <span>
                 Tk.{" "}
-                {isNaN(paid_amount) ? "0.00" : paid_amount.toFixed(2) || "0.00"}
+                {isNaN(paidAmount) ? "0.00" : paidAmount.toFixed(2) || "0.00"}
               </span>
             </div>
             <div className="flex w-full justify-between border-t border-gray-900/10 pt-2 md:w-1/2">
@@ -361,15 +346,15 @@ const InvoiceForm = () => {
               setIsOpen={setIsOpen}
               invoiceInfo={{
                 orderId,
-                cashierInfo,
-                customer_name,
-                customer_phone,
-                customer_address,
+                shop,
+                customerName,
+                customerContactNo,
+                customerAddress,
                 subTotal,
-                paid_amount,
+                paidAmount,
                 due,
-                delivery_charge,
-                total,
+                deliveryCharge,
+                grandTotal,
                 note,
               }}
               items={items}
@@ -389,8 +374,8 @@ const InvoiceForm = () => {
                     min="0.01"
                     step="0.01"
                     placeholder="0.0"
-                    value={deliveryCharge}
-                    onChange={(event) => setDeliveryCharge(event.target.value)}
+                    value={deliveryAmount}
+                    onChange={(event) => setDeliveryAmount(event.target.value)}
                   />
                   <span className="rounded-r-md bg-gray-200 py-2 px-4 text-gray-500 shadow-sm">
                     $

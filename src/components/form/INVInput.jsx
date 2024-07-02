@@ -2,7 +2,6 @@ import { Form, Input } from "antd";
 import { Controller } from "react-hook-form";
 
 const INVInput = ({ type, name, label, disabled, defaultValue, readOnly }) => {
-  console.log(`default value`, defaultValue);
   return (
     <div style={{ marginBottom: "20px" }}>
       <Controller

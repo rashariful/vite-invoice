@@ -1,46 +1,29 @@
 /* eslint-disable react/prop-types */
 import Barcode from "react-barcode";
-import icchaporon from "../../src/img/logo-ip.png";
-import ifashion from "../../src/img/I Fashion Logo.png";
-import mi from "../../src/img/images.png";
 
 const Invoice = ({ invoiceInfo, copy, date, items }) => {
+  console.log(invoiceInfo);
   return (
     <div>
       <div className="mx-5 grid grid-cols-3">
         <div className="col-span-1">
           <div className="">
             <p>Bill From</p>
-            <img
-              className="my-4 w-20"
-              src={
-                invoiceInfo.cashierInfo?.image ||
-                (invoiceInfo.cashier_name === "icchaporon.com"
-                  ? icchaporon
-                  : invoiceInfo.cashier_name === "I fashion"
-                  ? ifashion
-                  : invoiceInfo.cashier_name === "Mi Official Store"
-                  ? mi
-                  : icchaporon)
-              }
-              alt=""
-            />
+            <img className="my-4 w-20" src={invoiceInfo.shop?.image} alt="" />
           </div>
 
-          <h2 className=" text-2xl font-bold">
-            {invoiceInfo.cashierInfo?.name || invoiceInfo.cashier_name}
-          </h2>
+          <h2 className=" text-2xl font-bold">{invoiceInfo?.shop?.name}</h2>
           <h2 className="text-xl font-bold">COD</h2>
 
-          {invoiceInfo.cashierInfo?.address ? (
+          {invoiceInfo.shop?.address ? (
             <div
               className="text-xs"
               dangerouslySetInnerHTML={{
-                __html: invoiceInfo.cashierInfo.address,
+                __html: invoiceInfo.shop.address,
               }}
             />
           ) : (
-            <div className="text-xs">{invoiceInfo.customer_address}</div>
+            <div className="text-xs">{invoiceInfo.customerName}</div>
           )}
 
           <p className="text-xs">
@@ -66,14 +49,14 @@ const Invoice = ({ invoiceInfo, copy, date, items }) => {
 
           <p className="text-xs font-bold">
             Bill To:{" "}
-            <span className="font-normal">{invoiceInfo.customer_name}</span>
+            <span className="font-normal">{invoiceInfo.customerName}</span>
           </p>
           <p className="text-xs font-bold">
             Mobile no.{" "}
-            <span className="font-normal">{invoiceInfo.customer_phone}</span>
+            <span className="font-normal">{invoiceInfo.customerContactNo}</span>
           </p>
           <p className="text-xs font-bold">Address:</p>
-          <p className="text-xs">{invoiceInfo.customer_address}</p>
+          <p className="text-xs">{invoiceInfo.customerAddress}</p>
         </div>
       </div>
       <div className="mx-5 mt-10">
@@ -87,7 +70,7 @@ const Invoice = ({ invoiceInfo, copy, date, items }) => {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
+            {items?.map((item) => (
               <tr key={item.id}>
                 <td className="w-[60%]">{item.name || "item"}</td>
                 <td className="min-w-[100px] text-center">Tk. {item.price}</td>
@@ -112,9 +95,9 @@ const Invoice = ({ invoiceInfo, copy, date, items }) => {
             <span className="font-bold">Delivery Charge:</span>
             <span>
               Tk.{" "}
-              {isNaN(invoiceInfo.delivery_charge)
+              {isNaN(invoiceInfo.deliveryCharge)
                 ? "0.00"
-                : invoiceInfo.delivery_charge}
+                : invoiceInfo.deliveryCharge}
             </span>
           </div>
           <div className="flex w-full justify-between">
@@ -126,9 +109,7 @@ const Invoice = ({ invoiceInfo, copy, date, items }) => {
           <div className="flex w-full justify-between">
             <span className="font-bold">Paid Amount:</span>
             <span>
-              {isNaN(invoiceInfo.paid_amount)
-                ? "0.00"
-                : invoiceInfo.paid_amount}{" "}
+              {isNaN(invoiceInfo.paidAmount) ? "0.00" : invoiceInfo.paidAmount}{" "}
               BDT
             </span>
           </div>

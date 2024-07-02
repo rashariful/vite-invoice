@@ -18,7 +18,6 @@ const InvoiceFileUpload = () => {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    console.log(formData);
 
     fetch("http://localhost:4000/api/v1/xltjson", {
       method: "POST",
@@ -26,7 +25,6 @@ const InvoiceFileUpload = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("File uploaded successfully:", data?.data);
         setData(data);
       })
       .catch((error) => console.error("Error uploading file:", error));

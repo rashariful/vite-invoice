@@ -10,7 +10,6 @@ const INVSelect = ({
   loading,
   defaultValue,
 }) => {
-  console.log(defaultValue);
   return (
     <Controller
       name={name}

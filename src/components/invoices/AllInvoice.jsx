@@ -1,4 +1,4 @@
-import { Col, Row, Select, Space, Table, Tag } from "antd";
+import { Col, Row, Space, Table, Tag } from "antd";
 import { useState } from "react";
 import InvoiceModal from "../InvoiceModal";
 import SearchComp from "../usableCompo/SearchComp";
@@ -16,6 +16,7 @@ import { EyeFilled, EditOutlined } from "@ant-design/icons";
 import INVSelect from "../form/INVSelect";
 import CommonButton from "../UI/CommonButton";
 import InvoiceTab from "./InvoiceTab";
+import { useGetAllShopQuery } from "../../redux/api/shopApi";
 
 const AllInvoices = () => {
   const [open, setOpen] = useState(false);
@@ -25,7 +26,6 @@ const AllInvoices = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [id, setId] = useState("");
-
   const searchQuery = [
     {
       name: "limit",
@@ -56,14 +56,38 @@ const AllInvoices = () => {
       setActiveTab(key);
     }
   };
-  console.log(searchQuery, activeTab);
+
+  const { data: shopData, isLoading: isShopLoading } = useGetAllShopQuery();
   const {
     data: allData,
     isLoading,
     isFetching: isInvoicesFetching,
     refetch: refetchInvoice,
-  } = useGetAllInvoiceQuery(searchQuery);
+  } = useGetAllInvoiceQuery(searchQuery, {
+    skip: isShopLoading,
+  });
 
+  const allInvoiceData = allData?.data?.map((item) => {
+    return {
+      orderId: item?.orderId,
+      shop: item?.cashier_name
+        ? shopData?.data?.find((shop) => shop?.name === item?.cashier_name)
+        : shopData?.data?.find((shop) => shop?._id === item?.shop),
+      customerName: item?.customer_name || item?.customer?.name,
+      customerContactNo: item?.customer_phone || item?.customer?.contactNo,
+      customerAddress: item?.customer_address || item?.customer?.address,
+      deliveryCharge: item?.delivery_charge || item?.deliveryCharge,
+      subTotal: item?.subTotal || item?.subTotal,
+      paidAmount: item?.paid_amount || item?.paidAmount,
+      note: item?.note,
+      due: item?.due,
+      grandTotal: item?.total || item?.grandTotal,
+      items: item?.items || item?.products,
+      status: item?.status,
+      createdAt: item?.createdAt,
+      _id: item?._id,
+    };
+  });
   const [updateInvoice] = useUpdateInvoiceMutation();
 
   const {
@@ -71,6 +95,36 @@ const AllInvoices = () => {
     isLoading: isSingleInvoiceLoading,
     isFetching: isSingleInvoiceFetching,
   } = useGetSingleInvoiceQuery(id);
+  const singleInvoiceData = {
+    orderId: singleInvoice?.data?.orderId,
+    shop: singleInvoice?.data?.cashier_name
+      ? shopData?.data?.find(
+          (shop) => shop?.name === singleInvoice?.data?.cashier_name
+        )
+      : shopData?.data?.find((shop) => shop?._id === singleInvoice?.data?.shop),
+    customerName:
+      singleInvoice?.data?.customer_name || singleInvoice?.data?.customer?.name,
+    customerContactNo:
+      singleInvoice?.data?.customer_phone ||
+      singleInvoice?.data?.customer?.contactNo,
+    customerAddress:
+      singleInvoice?.data?.customer_address ||
+      singleInvoice?.data?.customer?.address,
+    deliveryCharge:
+      singleInvoice?.data?.delivery_charge ||
+      singleInvoice?.data?.deliveryCharge,
+    subTotal: singleInvoice?.data?.subTotal || singleInvoice?.data?.subTotal,
+    paidAmount:
+      singleInvoice?.data?.paid_amount || singleInvoice?.data?.paidAmount,
+    note: singleInvoice?.data?.note,
+    due: singleInvoice?.data?.due,
+    grandTotal: singleInvoice?.data?.total || singleInvoice?.data?.grandTotal,
+    items: singleInvoice?.data?.items,
+    status: singleInvoice?.data?.status,
+    createdAt: singleInvoice?.data?.createdAt,
+    _id: singleInvoice?.data?._id,
+  };
+
   const onSubmit = async (data) => {
     try {
       await updateInvoice({
@@ -133,29 +187,35 @@ const AllInvoices = () => {
       ),
     },
     {
-      title: "Cashier Name",
-      dataIndex: "cashier_name",
+      title: "Cashier Details",
+      key: "_id",
       render: (_, item) => (
         <div>
           <p>
-            <strong>{item.cashier_name}</strong>
+            <strong>Cashier Name:</strong> {item?.shop?.name}
+          </p>
+          <p>
+            <strong>Cashier Phone:</strong> {item?.shop?.contactNo}
+          </p>
+          <p>
+            <strong>Cashier Address:</strong> {item?.shop?.address}
           </p>
         </div>
       ),
     },
     {
       title: "Customer Details",
-      dataIndex: "customer_name",
+      key: "_id",
       render: (_, item) => (
         <div>
           <p>
-            <strong>Customer Name:</strong> {item.customer_name}
+            <strong>Customer Name:</strong> {item.customerName}
           </p>
           <p>
-            <strong>Customer Phone:</strong> {item.customer_phone}
+            <strong>Customer Phone:</strong> {item.customerContactNo}
           </p>
           <p>
-            <strong>Customer Address:</strong> {item.customer_address}
+            <strong>Customer Address:</strong> {item.customerAddress}
           </p>
         </div>
       ),
@@ -165,7 +225,7 @@ const AllInvoices = () => {
       dataIndex: `items`,
       fixed: "right",
       key: "items",
-      render: (items) => items.length,
+      render: (items) => items?.length,
     },
     {
       title: "Action",
@@ -176,6 +236,7 @@ const AllInvoices = () => {
         <Space size="middle">
           <EyeFilled
             onClick={() => {
+              console.log(record);
               setInfo(record);
               setOpen(true);
             }}
@@ -219,7 +280,7 @@ const AllInvoices = () => {
         columns={columns}
         loading={isInvoicesFetching}
         rowKey="_id"
-        dataSource={allData?.data}
+        dataSource={allInvoiceData}
         pagination={false}
         scroll={{ x: 400 }}
       />
@@ -253,7 +314,7 @@ const AllInvoices = () => {
       >
         <INVForm
           defaultValues={{
-            status: singleInvoice?.data?.status || "",
+            status: singleInvoiceData?.status || "",
           }}
           onSubmit={onSubmit}
         >
@@ -269,7 +330,7 @@ const AllInvoices = () => {
                 name="status"
                 label="Shipping Status"
                 type="text"
-                defaultValue={singleInvoice?.data?.shippingStatus}
+                defaultValue={singleInvoiceData?.status}
                 loading={isSingleInvoiceFetching || isSingleInvoiceLoading}
               />
             </Col>
