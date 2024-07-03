@@ -5,11 +5,11 @@ import FullReload from 'vite-plugin-full-reload';
 export default defineConfig({
   plugins: [
     react(), // Use the correct plugin
-    FullReload(['config/routes.rb', 'app/views/**/*']),
+    FullReload(["config/routes.rb", "app/views/**/*"]),
     // Add other plugins as needed
   ],
   server: {
-    port: 3000,
+    port: 4001,
     watch: {
       usePolling: true,
     },

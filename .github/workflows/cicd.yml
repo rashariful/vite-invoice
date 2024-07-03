@@ -1,0 +1,32 @@
+name: Digital Agency Park CI/CD
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [20.14.0]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    env:
+      VITE_SERVER_BASE_URL: ${{secrets.VITE_SERVER_BASE_URL}}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - run: npm ci
+      - name: Change Directory
+        run: cd /root/invoice/actions-invoice-frontend/_work/vite-invoice/vite-invoice
+      - name: Restart Nginx
+        run: npm run build
+
+        
