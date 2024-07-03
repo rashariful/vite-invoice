@@ -3,9 +3,6 @@ import { uid } from "uid";
 import InvoiceItem from "./InvoiceItem";
 import InvoiceModal from "./InvoiceModal";
 import { useGetAllInvoiceQuery } from "../redux/api/invoiceApi";
-import icchaporon from "../../src/img/logo-ip.png";
-import ifashion from "../../src/img/I Fashion Logo.png";
-import mi from "../../src/img/images.png";
 import { useGetAllShopQuery } from "../redux/api/shopApi";
 const date = new Date();
 const today = date.toLocaleDateString("en-GB", {
