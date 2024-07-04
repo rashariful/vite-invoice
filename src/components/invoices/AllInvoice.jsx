@@ -2,7 +2,6 @@ import { Col, Row, Space, Table, Tag } from "antd";
 import { useState } from "react";
 import InvoiceModal from "../InvoiceModal";
 import SearchComp from "../usableCompo/SearchComp";
-import IPPagination from "../usableCompo/IPPagination";
 import {
   useGetAllInvoiceQuery,
   useGetSingleInvoiceQuery,
@@ -17,6 +16,7 @@ import INVSelect from "../form/INVSelect";
 import CommonButton from "../UI/CommonButton";
 import InvoiceTab from "./InvoiceTab";
 import { useGetAllShopQuery } from "../../redux/api/shopApi";
+import INVPagination from "../usableCompo/INVPagination";
 
 const AllInvoices = () => {
   const [open, setOpen] = useState(false);
@@ -284,7 +284,7 @@ const AllInvoices = () => {
         pagination={false}
         scroll={{ x: 400 }}
       />
-      <IPPagination
+      <INVPagination
         style={{
           display: "flex",
           justifyContent: "flex-end",

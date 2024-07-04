@@ -3,8 +3,6 @@ import { Layout, Menu } from "antd";
 import { Link, Outlet } from "react-router-dom";
 const { Content, Footer, Sider } = Layout;
 
-
-
 const App = () => {
   // const {
   //   token
@@ -33,6 +31,11 @@ const App = () => {
               key: "3",
               icon: <DatabaseOutlined />,
               label: <Link to={"/invoice-upload"}>invoice upload</Link>,
+            },
+            {
+              key: "4",
+              icon: <DatabaseOutlined />,
+              label: <Link to={"/shop"}>shop</Link>,
             },
           ]}
         />

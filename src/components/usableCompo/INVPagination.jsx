@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Pagination } from "antd";
 
-const IPPagination = ({ page, setPage, total, pageSize, style, ...rest }) => {
+const INVPagination = ({ page, setPage, total, pageSize, style, ...rest }) => {
   return (
     <Pagination
       {...rest}
@@ -14,4 +14,4 @@ const IPPagination = ({ page, setPage, total, pageSize, style, ...rest }) => {
   );
 };
 
-export default IPPagination;
+export default INVPagination;

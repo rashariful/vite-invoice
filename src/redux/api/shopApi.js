@@ -7,6 +7,7 @@ const shopApi = baseApi.injectEndpoints({
         url: "/shop",
         method: "POST",
         body: data,
+        contentType: "multipart/form-data",
       }),
       invalidatesTags: ["shop"],
     }),
@@ -46,6 +47,7 @@ const shopApi = baseApi.injectEndpoints({
           url: `/shop/${data.id}`,
           method: "PATCH",
           body: data.body,
+          contentType: "multipart/form-data",
         };
       },
       invalidatesTags: ["shop"],

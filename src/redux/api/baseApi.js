@@ -4,6 +4,7 @@ const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://invapi.icchaporon.com/api/v1",
+    // baseUrl: "http://localhost:4000/api/v1",
   }),
   endpoints: () => ({}),
   tagTypes: ["invoice"],
