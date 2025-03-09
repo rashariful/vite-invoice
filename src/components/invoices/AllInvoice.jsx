@@ -1,4 +1,4 @@
-import { Col, Row, Space, Table, Tag } from "antd";
+import { Button, Col, message, Row, Space, Table, Tag } from "antd";
 import { useState } from "react";
 import InvoiceModal from "../InvoiceModal";
 import SearchComp from "../usableCompo/SearchComp";
@@ -12,11 +12,12 @@ import moment from "moment";
 import INVModal from "../UI/INVModal";
 import INVForm from "../form/INVForm";
 import { EyeFilled, EditOutlined } from "@ant-design/icons";
-import INVSelect from "../form/INVSelect";
+// import INVSelect from "../form/INVSelect";
 import CommonButton from "../UI/CommonButton";
 import InvoiceTab from "./InvoiceTab";
 import { useGetAllShopQuery } from "../../redux/api/shopApi";
 import INVPagination from "../usableCompo/INVPagination";
+import { FaTruckPickup } from "react-icons/fa";
 
 const AllInvoices = () => {
   const [open, setOpen] = useState(false);
@@ -26,6 +27,10 @@ const AllInvoices = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [id, setId] = useState("");
+  const [weight, setWeight] = useState(null);
+  const [note, setNote] = useState("");
+  const [isInsideDhaka, setIsInsideDhaka] = useState(true);
+  const [selectedInvoice, setSelectedInvoice] = useState();
   const searchQuery = [
     {
       name: "limit",
@@ -99,8 +104,8 @@ const AllInvoices = () => {
     orderId: singleInvoice?.data?.orderId,
     shop: singleInvoice?.data?.cashier_name
       ? shopData?.data?.find(
-          (shop) => shop?.name === singleInvoice?.data?.cashier_name
-        )
+        (shop) => shop?.name === singleInvoice?.data?.cashier_name
+      )
       : shopData?.data?.find((shop) => shop?._id === singleInvoice?.data?.shop),
     customerName:
       singleInvoice?.data?.customer_name || singleInvoice?.data?.customer?.name,
@@ -125,17 +130,31 @@ const AllInvoices = () => {
     _id: singleInvoice?.data?._id,
   };
 
-  const onSubmit = async (data) => {
+  const handleStatusChange = async (data) => {
+    const status = {
+      status: "DELIVERED",
+    };
     try {
       await updateInvoice({
         id: singleInvoice?.data?._id,
-        body: data,
+        body: status,
       });
-      setIsModalOpen(false);
+      // setIsModalOpen(false);
     } catch (error) {
       console.error(error);
     }
   };
+  // const onSubmit = async (data) => {
+  //   try {
+  //     await updateInvoice({
+  //       id: singleInvoice?.data?._id,
+  //       body: data,
+  //     });
+  //     setIsModalOpen(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const columns = [
     {
@@ -173,10 +192,10 @@ const AllInvoices = () => {
                   item.status === shippingStatus.PENDING
                     ? "yellow"
                     : item.status === shippingStatus.READY_TO_DELIVERY
-                    ? "purple"
-                    : item.status === shippingStatus.DELIVERED
-                    ? "green"
-                    : "red"
+                      ? "purple"
+                      : item.status === shippingStatus.DELIVERED
+                        ? "green"
+                        : "red"
                 }
               >
                 {item.status.toUpperCase()}
@@ -222,6 +241,7 @@ const AllInvoices = () => {
     },
     {
       title: "Items",
+      width: "10%",
       dataIndex: `items`,
       fixed: "right",
       key: "items",
@@ -229,9 +249,9 @@ const AllInvoices = () => {
     },
     {
       title: "Action",
+      width: "15%",
       key: "invoice",
       fixed: "right",
-      width: 100,
       render: (_, record) => (
         <Space size="middle">
           <EyeFilled
@@ -241,26 +261,38 @@ const AllInvoices = () => {
               setOpen(true);
             }}
             style={{
-              backgroundColor: "red",
-              color: "white",
+              // backgroundColor: "red",
+              border: "1px solid #93278f",
+              color: "#93278f",
               padding: "0.3rem",
               borderRadius: "0.3rem",
               fontSize: "1.2rem",
             }}
           />
-          <EditOutlined
+          {/* <FaTruckPickup
             onClick={() => {
               setId(record?._id);
               setIsModalOpen(true);
+              setSelectedInvoice(record)
             }}
             style={{
               backgroundColor: "green",
               color: "white",
-              padding: "0.3rem",
+              padding: "0.2rem",
               borderRadius: "0.3rem",
-              fontSize: "1.2rem",
+              fontSize: "1.5rem",
             }}
-          />
+          /> */}
+          {record.status === "pending" && <Button
+            onClick={() => {
+              setId(record?._id);
+              setIsModalOpen(true);
+              setSelectedInvoice(record)
+            }}
+            type="primary"
+            icon={<FaTruckPickup />}
+            className="bg-[#93278f]"
+          >Delivered</Button>}
         </Space>
       ),
     },
@@ -269,6 +301,46 @@ const AllInvoices = () => {
   if (isLoading) {
     return <p>loading......</p>;
   }
+  console.log(selectedInvoice, 'selectedInvoice',)
+  // console.log(selectedInvoice?.customerName, 'selectedInvoiceCustomer',)
+
+  console.log(allInvoiceData)
+  // console.log(singleInvoiceData, "single invoice data");
+
+  const handleSendParcel = async () => {
+    const data = {
+      customerName: selectedInvoice.customerName,
+      customerPhone: selectedInvoice.customerContactNo,
+      customerAddress: selectedInvoice.customerAddress,
+      orderId: selectedInvoice.orderId,
+      pickupAddress: selectedInvoice.shop.address,
+      cashCollection: selectedInvoice.grandTotal,
+      weight,
+      message: note,
+      isInsideDhaka,
+    }
+    console.log("handleSendParcel called", data);
+    try {
+      const response = await fetch("http://185.210.144.111:7021/api/v1/parcels", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error("Failed to send parcel");
+      message.success('Parcel sent successfully!');
+      setNote("");
+      setWeight(null);
+      setIsModalOpen(false);
+      console.log("Modal should close now, isModalOpen:", isModalOpen);
+
+      console.log("Parcel sent successfully!");
+    } catch (error) {
+      console.error(error);
+      // message.error('Failed to send parcel, please try again.');
+    }
+  };
+
 
   return (
     <div>
@@ -306,20 +378,22 @@ const AllInvoices = () => {
         />
       )}
       <INVModal
-        title="Change Status"
-        onOk={onSubmit}
+        title="Send Parcel"
+        onOk={handleSendParcel}
         open={isModalOpen}
         setOpen={setIsModalOpen}
         loading={isSingleInvoiceFetching}
       >
         <INVForm
           defaultValues={{
-            status: singleInvoiceData?.status || "",
+            isInsideDhaka: isInsideDhaka, // Set initial value
+            weight: weight || null,
+            note: note || "",
           }}
-          onSubmit={onSubmit}
+          onSubmit={handleSendParcel}
         >
           <Row gutter={[16, 16]}>
-            <Col span={24}>
+            {/* <Col span={24}>
               <INVSelect
                 options={Object.entries(shippingStatus)?.map(
                   ([key, value]) => ({
@@ -333,14 +407,68 @@ const AllInvoices = () => {
                 defaultValue={singleInvoiceData?.status}
                 loading={isSingleInvoiceFetching || isSingleInvoiceLoading}
               />
+            </Col> */}
+            <Col span={24}>
+              <div className="mb-4 flex gap-5">
+                <Button
+                  type={isInsideDhaka ? "primary" : "default"}
+                  onClick={() => setIsInsideDhaka(true)}
+                >
+                  Inside Dhaka
+                </Button>
+                <Button
+                  type={!isInsideDhaka ? "primary" : "default"}
+                  onClick={() => setIsInsideDhaka(false)}
+                >
+                  Outside Dhaka
+                </Button>
+              </div>
             </Col>
 
+            {/* Weight Field */}
             <Col span={24}>
-              <CommonButton htmlType="submit">Change Status</CommonButton>
+              <div>
+                <label htmlFor="weight" className="text-sm font-bold md:text-base">
+                  Weight:
+                </label>
+                <input
+                  required
+                  className="bg-slate-100 p-2 rounded-md w-full"
+                  type="number"
+                  name="weight"
+                  id="weight"
+                  value={weight}
+                  onChange={(event) => setWeight(event.target.value)}
+                />
+              </div>
+            </Col>
+
+            {/* Note Field */}
+            <Col span={24}>
+              <div>
+                <label htmlFor="note" className="text-sm font-bold md:text-base">
+                  Note:
+                </label>
+                <input
+                  required
+                  className="bg-slate-100 p-2 rounded-md w-full"
+                  type="text"
+                  name="note"
+                  id="note"
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
+                />
+              </div>
+            </Col>
+
+            {/* Submit Button */}
+            <Col span={24}>
+              <CommonButton htmlType="submit">Send Parcel</CommonButton>
             </Col>
           </Row>
         </INVForm>
       </INVModal>
+
     </div>
   );
 };

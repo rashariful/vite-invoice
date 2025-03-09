@@ -21,21 +21,25 @@ const App = () => {
               key: "1",
               icon: <FormOutlined />,
               label: <Link to={"/"}>create invoice</Link>,
+              className: "hover:bg-[#93278f] focus-within:bg-[#93278f] active:bg-[#93278f]"
             },
             {
               key: "2",
               icon: <DatabaseOutlined />,
-              label: <Link to={"/invoices"}>invoices</Link>,
+              label: <Link to={"/invoices"}>Order Invoices</Link>,
+              className: "hover:bg-[#93278f] focus-within:bg-[#93278f] active:bg-[#93278f]"
             },
             {
               key: "3",
               icon: <DatabaseOutlined />,
               label: <Link to={"/invoice-upload"}>invoice upload</Link>,
+              className: "hover:bg-[#93278f] focus-within:bg-[#93278f] active:bg-[#93278f]"
             },
             {
               key: "4",
               icon: <DatabaseOutlined />,
               label: <Link to={"/shop"}>shop</Link>,
+              className: "hover:bg-[#93278f] focus-within:bg-[#93278f] active:bg-[#93278f]"
             },
           ]}
         />

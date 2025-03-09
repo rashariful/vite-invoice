@@ -289,7 +289,7 @@ const InvoiceForm = () => {
             </tbody>
           </table>
           <button
-            className="rounded-md bg-blue-500 px-4 py-2 text-sm text-white shadow-sm hover:bg-blue-600"
+            className="rounded-md bg-[#93278f] px-4 py-2 text-sm text-white shadow-sm hover:bg-[#a530a1]"
             type="button"
             onClick={addItemHandler}
           >
@@ -333,7 +333,7 @@ const InvoiceForm = () => {
         <div className="basis-1/4 bg-transparent">
           <div className="sticky top-0 z-10 space-y-4 divide-y divide-gray-900/10 pb-8 md:pt-6 md:pl-4">
             <button
-              className="w-full rounded-md bg-blue-500 py-2 text-sm text-white shadow-sm hover:bg-blue-600"
+              className="w-full rounded-md bg-[#93278f] py-2 text-sm text-white shadow-sm hover:bg-[#a530a1]"
               type="submit"
             >
               Review Invoice
@@ -408,7 +408,7 @@ const InvoiceForm = () => {
                 <div className="space-y-4">
                   <a
                     onClick={toggleVisibility}
-                    className="rounded-sm cursor-pointer bg-blue-300 px-3 py-1 text-xs text-white hover:bg-blue-500 focus:outline-none focus:ring"
+                    className="rounded-sm cursor-pointer bg-[#93278f] px-3 py-1 text-xs text-white hover:bg-[#a530a1] focus:outline-none focus:ring"
                   >
                     add a note
                   </a>
@@ -420,7 +420,7 @@ const InvoiceForm = () => {
                       rows={5}
                       cols={36}
                       placeholder="Type something here..."
-                      // Add any additional props or styling as needed
+                    // Add any additional props or styling as needed
                     />
                   )}
                 </div>
