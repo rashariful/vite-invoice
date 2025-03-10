@@ -301,10 +301,10 @@ const AllInvoices = () => {
   if (isLoading) {
     return <p>loading......</p>;
   }
-  console.log(selectedInvoice, 'selectedInvoice',)
+  // console.log(selectedInvoice, 'selectedInvoice',)
   // console.log(selectedInvoice?.customerName, 'selectedInvoiceCustomer',)
 
-  console.log(allInvoiceData)
+  // console.log(allInvoiceData)
   // console.log(singleInvoiceData, "single invoice data");
 
   const handleSendParcel = async () => {
@@ -319,9 +319,9 @@ const AllInvoices = () => {
       message: note,
       isInsideDhaka,
     }
-    console.log("handleSendParcel called", data);
+    // console.log("handleSendParcel called", data);
     try {
-      const response = await fetch("http://185.210.144.111:7021/api/v1/parcels", {
+      const response = await fetch("https://invoice-server.icchaporon.com/api/v1/parcels", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -337,7 +337,7 @@ const AllInvoices = () => {
       console.log("Parcel sent successfully!");
     } catch (error) {
       console.error(error);
-      // message.error('Failed to send parcel, please try again.');
+      message.error('Failed to send parcel, please try again.');
     }
   };
 
@@ -450,7 +450,6 @@ const AllInvoices = () => {
                   Note:
                 </label>
                 <input
-                  required
                   className="bg-slate-100 p-2 rounded-md w-full"
                   type="text"
                   name="note"

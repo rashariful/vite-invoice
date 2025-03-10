@@ -9,7 +9,7 @@ export default defineConfig({
     // Add other plugins as needed
   ],
   server: {
-    port: 4001,
+    port: 3000,
     watch: {
       usePolling: true,
     },
