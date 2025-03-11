@@ -292,7 +292,7 @@ const AllInvoices = () => {
             type="primary"
             icon={<FaTruckPickup />}
             className="bg-[#93278f]"
-          >Delivered</Button>}
+          >Ready For Pickup</Button>}
         </Space>
       ),
     },
