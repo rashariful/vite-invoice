@@ -130,20 +130,20 @@ const AllInvoices = () => {
     _id: singleInvoice?.data?._id,
   };
 
-  const handleStatusChange = async (data) => {
-    const status = {
-      status: "DELIVERED",
-    };
-    try {
-      await updateInvoice({
-        id: singleInvoice?.data?._id,
-        body: status,
-      });
-      // setIsModalOpen(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const handleStatusChange = async (data) => {
+  //   const status = {
+  //     status: "DELIVERED",
+  //   };
+  //   try {
+  //     await updateInvoice({
+  //       id: singleInvoice?.data?._id,
+  //       body: status,
+  //     });
+  //     // setIsModalOpen(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
   // const onSubmit = async (data) => {
   //   try {
   //     await updateInvoice({
@@ -310,7 +310,10 @@ const AllInvoices = () => {
   const handleSendParcel = async () => {
     const data = {
       customerName: selectedInvoice.customerName,
-      customerPhone: selectedInvoice.customerContactNo,
+      // customerPhone: selectedInvoice.customerContactNo,
+      customerPhone: selectedInvoice.customerContactNo.startsWith("0")
+    ? selectedInvoice.customerContactNo
+    : "0" + selectedInvoice.customerContactNo,
       customerAddress: selectedInvoice.customerAddress,
       orderId: selectedInvoice.orderId,
       pickupAddress: selectedInvoice.shop.address,
@@ -325,8 +328,8 @@ const AllInvoices = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      });
-
+      })
+      console.log("Final Payload:", JSON.stringify(data))
       if (!response.ok) throw new Error("Failed to send parcel");
       message.success('Parcel sent successfully!');
       setNote("");
@@ -438,7 +441,9 @@ const AllInvoices = () => {
                   name="weight"
                   id="weight"
                   value={weight}
-                  onChange={(event) => setWeight(event.target.value)}
+                  placeholder="Weight by gram"
+                  onChange={(event) => setWeight(Number(event.target.value))}
+                  // onChange={(event) => setWeight(event.target.value)}
                 />
               </div>
             </Col>
