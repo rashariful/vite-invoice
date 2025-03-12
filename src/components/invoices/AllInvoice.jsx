@@ -31,27 +31,38 @@ const AllInvoices = () => {
   const [note, setNote] = useState("");
   const [isInsideDhaka, setIsInsideDhaka] = useState(true);
   const [selectedInvoice, setSelectedInvoice] = useState();
+  // const searchQuery = [
+  //   {
+  //     name: "limit",
+  //     value: 10 + "",
+  //   },
+  //   {
+  //     name: "page",
+  //     value: page + "",
+  //   },
+  // ];
+  // if (searchTerm) {
+  //   searchQuery.push({
+  //     name: "searchTerm",
+  //     value: searchTerm,
+  //   });
+  // }
+  // if (activeTab !== "all") {
+  //   searchQuery.push({
+  //     name: "status",
+  //     value: activeTab,
+  //   });
+  // }
+
   const searchQuery = [
-    {
-      name: "limit",
-      value: 10 + "",
-    },
-    {
-      name: "page",
-      value: page + "",
-    },
+    { name: "limit", value: "10" },
+    { name: "page", value: page.toString() },
   ];
   if (searchTerm) {
-    searchQuery.push({
-      name: "searchTerm",
-      value: searchTerm,
-    });
+    searchQuery.push({ name: "searchTerm", value: searchTerm }); // Passing the search term to the query
   }
   if (activeTab !== "all") {
-    searchQuery.push({
-      name: "status",
-      value: activeTab,
-    });
+    searchQuery.push({ name: "status", value: activeTab });
   }
   const handleTabChange = (key) => {
     if (key === "all") {
@@ -249,7 +260,7 @@ const AllInvoices = () => {
     },
     {
       title: "Action",
-      width: "15%",
+      width: "20%",
       key: "invoice",
       fixed: "right",
       render: (_, record) => (
