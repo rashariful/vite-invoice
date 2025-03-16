@@ -328,7 +328,7 @@ const AllInvoices = () => {
       customerAddress: selectedInvoice.customerAddress,
       orderId: selectedInvoice.orderId,
       pickupAddress: selectedInvoice.shop.address,
-      cashCollection: selectedInvoice.grandTotal,
+      cashCollection: selectedInvoice.due,
       weight,
       message: note,
       isInsideDhaka,
@@ -354,7 +354,7 @@ const AllInvoices = () => {
       message.error('Failed to send parcel, please try again.');
     }
   };
-
+console.log(allInvoiceData);
 
   return (
     <div>
