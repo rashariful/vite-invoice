@@ -381,10 +381,6 @@ const AllInvoices = () => {
       message.error("Failed to send parcel, please try again.");
     }
   };
-<<<<<<< HEAD
-=======
-
->>>>>>> 43787efa0d1c99e7dda981c765f1444514e46107
 
   return (
     <div>
