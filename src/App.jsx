@@ -1,6 +1,7 @@
 import { FormOutlined, DatabaseOutlined } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { Link, Outlet } from "react-router-dom";
+import { DashboardSidebar } from "./SideBarDashboard";
 const { Content, Footer, Sider } = Layout;
 
 const App = () => {
@@ -10,7 +11,7 @@ const App = () => {
   // } = theme.useToken();
   return (
     <Layout>
-      <Sider breakpoint="lg" collapsedWidth="0">
+      {/* <Sider breakpoint="lg" collapsedWidth="0">
         <div className="demo-logo-vertical" />
         <Menu
           theme="dark"
@@ -43,22 +44,16 @@ const App = () => {
             },
           ]}
         />
-      </Sider>
+      </Sider> */}
+      <DashboardSidebar/>
       <Layout>
-        {/* <Header
-          style={{
-            padding: 0,
-            // background: colorBgContainer,
-            background: "#f3f4f6",
-          }}
-        /> */}
         <Content
           style={{
             margin: "24px 16px 0",
           }}
         >
           <div className="min-h-screen bg-gray-100">
-            <div className="mx-auto max-w-7xl">
+            <div className="max-w-screen-4xl mx-auto">
               <Outlet />
             </div>
           </div>
@@ -69,6 +64,9 @@ const App = () => {
           }}
         >
           {/* footer content */}
+          <div><p>
+            
+          All kind of received <strong>Digital agency park</strong></p></div>
         </Footer>
       </Layout>
     </Layout>
