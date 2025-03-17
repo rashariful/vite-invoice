@@ -298,7 +298,7 @@ const AllInvoices = () => {
               >
                 <DeleteOutlined /> Delete
               </Menu.Item>
-              
+
               {record.status === "pending" && (
                 <Menu.Item
                   key="ready"
@@ -352,7 +352,7 @@ const AllInvoices = () => {
       customerAddress: selectedInvoice.customerAddress,
       orderId: selectedInvoice.orderId,
       pickupAddress: selectedInvoice.shop.address,
-      cashCollection: selectedInvoice.grandTotal,
+      cashCollection: selectedInvoice.due,
       weight,
       message: note,
       isInsideDhaka,
