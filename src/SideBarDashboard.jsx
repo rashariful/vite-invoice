@@ -30,7 +30,7 @@ export function DashboardSidebar() {
       <div className="p-4 mt-5 border-gray-200 flex flex-col items-center gap-3">
         <img
           className="h-24 w-24 rounded-full"
-          src="https://thehelmclothing.com/cdn/shop/articles/DSC0341_1200x1200.jpg?v=1529429074"
+          src="https://avatars.githubusercontent.com/u/85520624?v=4"
           alt="Profile"
         />
         {!collapsed && (
