@@ -358,8 +358,7 @@ const AllInvoices = () => {
       message: note,
       delivery_type_id: isInsideDhaka,
     };
-    console.log("handleSendParcel called", data);
-    return;
+   
     try {
       const response = await fetch(
         "https://invoice-server.icchaporon.com/api/v1/parcels",
