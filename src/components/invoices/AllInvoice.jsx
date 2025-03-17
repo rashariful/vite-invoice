@@ -1,7 +1,16 @@
-import { Button, Col, message, Row, Space, Table, Tag } from "antd";
+import {
+  Button,
+  Col,
+  Dropdown,
+  Menu,
+  message,
+  Row,
+  Table,
+  Tag,
+  Tooltip,
+} from "antd";
 import { useState } from "react";
 import InvoiceModal from "../InvoiceModal";
-import SearchComp from "../usableCompo/SearchComp";
 import {
   useGetAllInvoiceQuery,
   useGetSingleInvoiceQuery,
@@ -11,13 +20,17 @@ import { shippingStatus } from "../../const/shippingStatus";
 import moment from "moment";
 import INVModal from "../UI/INVModal";
 import INVForm from "../form/INVForm";
-import { EyeFilled, EditOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+} from "@ant-design/icons";
 // import INVSelect from "../form/INVSelect";
 import CommonButton from "../UI/CommonButton";
-import InvoiceTab from "./InvoiceTab";
 import { useGetAllShopQuery } from "../../redux/api/shopApi";
 import INVPagination from "../usableCompo/INVPagination";
 import { FaTruckPickup } from "react-icons/fa";
+import OrderManagement from "./OrderManagement";
 
 const AllInvoices = () => {
   const [open, setOpen] = useState(false);
@@ -64,6 +77,7 @@ const AllInvoices = () => {
   if (activeTab !== "all") {
     searchQuery.push({ name: "status", value: activeTab });
   }
+
   const handleTabChange = (key) => {
     if (key === "all") {
       setActiveTab("all");
@@ -74,6 +88,7 @@ const AllInvoices = () => {
   };
 
   const { data: shopData, isLoading: isShopLoading } = useGetAllShopQuery();
+
   const {
     data: allData,
     isLoading,
@@ -82,6 +97,8 @@ const AllInvoices = () => {
   } = useGetAllInvoiceQuery(searchQuery, {
     skip: isShopLoading,
   });
+
+
 
   const allInvoiceData = allData?.data?.map((item) => {
     return {
@@ -104,6 +121,21 @@ const AllInvoices = () => {
       _id: item?._id,
     };
   });
+
+  const today = moment().startOf("day");
+  const yesterday = moment().subtract(1, "days").startOf("day");
+  const startOfWeek = moment().startOf("week");
+  const startOfMonth = moment().startOf("month");
+  
+  const todayInvoices = allData?.data?.filter((invoice) => moment(invoice.createdAt).isSame(today, "day"));
+  const yesterdayInvoices =allData?.data?.filter((invoice) => moment(invoice.createdAt).isSame(yesterday, "day"));
+  const weeklyInvoices = allData?.data?.filter((invoice) => moment(invoice.createdAt).isSameOrAfter(startOfWeek, "day"));
+  const monthlyInvoices = allData?.data?.filter((invoice) => moment(invoice.createdAt).isSameOrAfter(startOfMonth, "day"));
+  
+
+  // fintering by date end here 
+
+
   const [updateInvoice] = useUpdateInvoiceMutation();
 
   const {
@@ -111,12 +143,13 @@ const AllInvoices = () => {
     isLoading: isSingleInvoiceLoading,
     isFetching: isSingleInvoiceFetching,
   } = useGetSingleInvoiceQuery(id);
+
   const singleInvoiceData = {
     orderId: singleInvoice?.data?.orderId,
     shop: singleInvoice?.data?.cashier_name
       ? shopData?.data?.find(
-        (shop) => shop?.name === singleInvoice?.data?.cashier_name
-      )
+          (shop) => shop?.name === singleInvoice?.data?.cashier_name
+        )
       : shopData?.data?.find((shop) => shop?._id === singleInvoice?.data?.shop),
     customerName:
       singleInvoice?.data?.customer_name || singleInvoice?.data?.customer?.name,
@@ -141,190 +174,181 @@ const AllInvoices = () => {
     _id: singleInvoice?.data?._id,
   };
 
-  // const handleStatusChange = async (data) => {
-  //   const status = {
-  //     status: "DELIVERED",
-  //   };
-  //   try {
-  //     await updateInvoice({
-  //       id: singleInvoice?.data?._id,
-  //       body: status,
-  //     });
-  //     // setIsModalOpen(false);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  // const onSubmit = async (data) => {
-  //   try {
-  //     await updateInvoice({
-  //       id: singleInvoice?.data?._id,
-  //       body: data,
-  //     });
-  //     setIsModalOpen(false);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   const columns = [
     {
-      title: "Order Details",
-      key: "orderId",
+      title: "NO.",
+      key: "index",
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "SHOP",
+      key: "shop",
       render: (_, item) => (
-        <div>
-          <div className="space-y-1">
-            <p>
-              Order Number:{" "}
-              <Tag
-                style={{
-                  backgroundColor: "#93278f",
-                  color: "white",
-                  fontWeight: "bold",
-                }}
-              >
-                {item?.orderId}
-              </Tag>
-            </p>
-            <p>
-              Order Date:{" "}
-              <Tag
-                style={{
-                  fontWeight: "bold",
-                }}
-              >
-                {moment(item?.createdAt).format("MMMM D, YYYY h:mm A")}
-              </Tag>
-            </p>
-            <p>
-              Order Status:{" "}
-              <Tag
-                color={
-                  item.status === shippingStatus.PENDING
-                    ? "yellow"
-                    : item.status === shippingStatus.READY_TO_DELIVERY
-                      ? "purple"
-                      : item.status === shippingStatus.DELIVERED
-                        ? "green"
-                        : "red"
-                }
-              >
-                {item.status.toUpperCase()}
-              </Tag>
-            </p>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Cashier Details",
-      key: "_id",
-      render: (_, item) => (
-        <div>
-          <p>
-            <strong>Cashier Name:</strong> {item?.shop?.name}
-          </p>
-          <p>
-            <strong>Cashier Phone:</strong> {item?.shop?.contactNo}
-          </p>
-          <p>
-            <strong>Cashier Address:</strong> {item?.shop?.address}
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "Customer Details",
-      key: "_id",
-      render: (_, item) => (
-        <div>
-          <p>
-            <strong>Customer Name:</strong> {item.customerName}
-          </p>
-          <p>
-            <strong>Customer Phone:</strong> {item.customerContactNo}
-          </p>
-          <p>
-            <strong>Customer Address:</strong> {item.customerAddress}
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "Items",
-      width: "10%",
-      dataIndex: `items`,
-      fixed: "right",
-      key: "items",
-      render: (items) => items?.length,
-    },
-    {
-      title: "Action",
-      width: "20%",
-      key: "invoice",
-      fixed: "right",
-      render: (_, record) => (
-        <Space size="middle">
-          <EyeFilled
-            onClick={() => {
-              console.log(record);
-              setInfo(record);
-              setOpen(true);
-            }}
-            style={{
-              // backgroundColor: "red",
-              border: "1px solid #93278f",
-              color: "#93278f",
-              padding: "0.3rem",
-              borderRadius: "0.3rem",
-              fontSize: "1.2rem",
-            }}
+        <Tooltip title={item?.shop?.name}>
+          <img
+            src={item?.shop?.image || "/default-shop.png"}
+            alt="Shop Logo"
+            className="w-8 h-8 rounded-full object-cover cursor-pointer"
           />
-          {/* <FaTruckPickup
-            onClick={() => {
-              setId(record?._id);
-              setIsModalOpen(true);
-              setSelectedInvoice(record)
-            }}
-            style={{
-              backgroundColor: "green",
-              color: "white",
-              padding: "0.2rem",
-              borderRadius: "0.3rem",
-              fontSize: "1.5rem",
-            }}
-          /> */}
-          {record.status === "pending" && <Button
-            onClick={() => {
-              setId(record?._id);
-              setIsModalOpen(true);
-              setSelectedInvoice(record)
-            }}
-            type="primary"
-            icon={<FaTruckPickup />}
-            className="bg-[#93278f]"
-          >Ready For Pickup</Button>}
-        </Space>
+        </Tooltip>
+      ),
+    },
+    {
+      title: "DATE",
+      key: "orderDate",
+      render: (_, item) => moment(item?.createdAt).format("MMM D, YYYY"),
+    },
+    {
+      title: "NAME",
+      key: "customerName",
+      dataIndex: "customerName",
+    },
+    {
+      title: "PHONE",
+      key: "customerPhone",
+      dataIndex: "customerContactNo",
+    },
+    {
+      title: "ADDRESS",
+      key: "customerAddress",
+      dataIndex: "customerAddress",
+    },
+    {
+      title: "PRODUCT NAME",
+      key: "productName",
+      render: (_, item) =>
+        item.items?.map((product) => product.name).join(", "),
+    },
+    {
+      title: "QUANTITY",
+      key: "quantity",
+      render: (_, item) =>
+        item.items?.reduce((total, product) => total + product.qty, 0),
+    },
+    {
+      title: "DELIVERY CHARGE",
+      key: "deliveryCharge",
+      render: (_, item) => {
+        let charge = item?.deliveryCharge || 0;
+        let location, color;
+        if (charge === 120) {
+          location = "Outside Dhaka";
+          color = "red";
+        } else if (charge === 60) {
+          location = "Inside Dhaka";
+          color = "green";
+        } else if (charge === 80) {
+          location = "Subarea";
+          color = "blue";
+        } else {
+          location = "Unknown";
+          color = "gray";
+        }
+        return (
+          <Tag color={color}>
+            {charge} BDT <span className="text-gray-600">({location})</span>
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "ORDER STATUS",
+      key: "orderStatus",
+      render: (_, item) => (
+        <Tag
+          color={
+            item.status === shippingStatus.PENDING
+              ? "yellow"
+              : item.status === shippingStatus.READY_TO_DELIVERY
+              ? "purple"
+              : item.status === shippingStatus.DELIVERED
+              ? "green"
+              : "red"
+          }
+        >
+          {item.status.toUpperCase()}
+        </Tag>
+      ),
+    },
+    {
+      title: "ACTION",
+      key: "action",
+      render: (_, record) => (
+        <Dropdown
+          overlay={
+            <Menu onClick={(e) => e.domEvent.stopPropagation()}>
+              {record.status === "pending" && (
+                <Menu.Item
+                  key="edit"
+                  onClick={() => {
+                    setSelectedInvoice(record);
+                    setIsEditModalOpen(true);
+                  }}
+                >
+                  <EditOutlined /> Edit
+                </Menu.Item>
+              )}
+              <Menu.Item
+                key="delete"
+                onClick={(e) => {
+                  e.domEvent.stopPropagation();
+                  handleDelete(record?._id);
+                }}
+                danger
+              >
+                <DeleteOutlined /> Delete
+              </Menu.Item>
+              
+              {record.status === "pending" && (
+                <Menu.Item
+                  key="ready"
+                  onClick={(e) => {
+                    e.domEvent.stopPropagation();
+                    setId(record?._id);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  <FaTruckPickup className="text-blue-500" /> Ready for Pickup
+                </Menu.Item>
+              )}
+            </Menu>
+          }
+          trigger={["click"]}
+        >
+          <Button
+            icon={<MoreOutlined />}
+            className="three-dots"
+            onClick={(e) => e.stopPropagation()} // Prevents row click from triggering modal
+          />
+        </Dropdown>
       ),
     },
   ];
 
+  // Handle row click to open modal
+  const onRowClick = (record, event) => {
+    if (
+      !event.target.closest(".three-dots") &&
+      !event.target.closest(".ant-dropdown-menu")
+    ) {
+      setInfo(record);
+      setOpen(true);
+    }
+  };
+
+  // column end here sharif
+
   if (isLoading) {
     return <p>loading......</p>;
   }
-  // console.log(selectedInvoice, 'selectedInvoice',)
-  // console.log(selectedInvoice?.customerName, 'selectedInvoiceCustomer',)
-
-  // console.log(allInvoiceData)
-  // console.log(singleInvoiceData, "single invoice data");
 
   const handleSendParcel = async () => {
     const data = {
       customerName: selectedInvoice.customerName,
       // customerPhone: selectedInvoice.customerContactNo,
       customerPhone: selectedInvoice.customerContactNo.startsWith("0")
-    ? selectedInvoice.customerContactNo
-    : "0" + selectedInvoice.customerContactNo,
+        ? selectedInvoice.customerContactNo
+        : "0" + selectedInvoice.customerContactNo,
       customerAddress: selectedInvoice.customerAddress,
       orderId: selectedInvoice.orderId,
       pickupAddress: selectedInvoice.shop.address,
@@ -332,17 +356,20 @@ const AllInvoices = () => {
       weight,
       message: note,
       isInsideDhaka,
-    }
+    };
     // console.log("handleSendParcel called", data);
     try {
-      const response = await fetch("https://invoice-server.icchaporon.com/api/v1/parcels", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-      console.log("Final Payload:", JSON.stringify(data))
+      const response = await fetch(
+        "https://invoice-server.icchaporon.com/api/v1/parcels",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
+      console.log("Final Payload:", JSON.stringify(data));
       if (!response.ok) throw new Error("Failed to send parcel");
-      message.success('Parcel sent successfully!');
+      message.success("Parcel sent successfully!");
       setNote("");
       setWeight(null);
       setIsModalOpen(false);
@@ -351,37 +378,48 @@ const AllInvoices = () => {
       console.log("Parcel sent successfully!");
     } catch (error) {
       console.error(error);
-      message.error('Failed to send parcel, please try again.');
+      message.error("Failed to send parcel, please try again.");
     }
   };
 
-
   return (
     <div>
-      <div className="my-5 space-y-2">
-        <SearchComp style={{ width: 200 }} setSearchTerm={setSearchTerm} />
-        <InvoiceTab activeTab={activeTab} handleTabChange={handleTabChange} />
+      <div className=" my-5 space-y-2">
+        <OrderManagement
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          allData={allData}
+          activeTab={activeTab}
+          handleTabChange={handleTabChange}
+          todayInvoices={todayInvoices}
+          yesterdayInvoices={yesterdayInvoices}
+          weeklyInvoices={weeklyInvoices}
+          monthlyInvoices={monthlyInvoices}
+        />
       </div>
-      <Table
-        columns={columns}
-        loading={isInvoicesFetching}
-        rowKey="_id"
-        dataSource={allInvoiceData}
-        pagination={false}
-        scroll={{ x: 400 }}
-      />
-      <INVPagination
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          padding: "1rem",
-        }}
-        page={page}
-        setPage={setPage}
-        total={allData?.meta.total}
-        pageSize={allData?.meta.limit}
-      />
+
+      <div className="shadow-md p-4 bg-white rounded-lg">
+        <Table
+          columns={columns}
+          dataSource={allInvoiceData}
+          onRow={(record) => ({
+            onClick: (event) => onRowClick(record, event),
+          })}
+          rowClassName="cursor-pointer hover:bg-gray-100"
+        />
+        <INVPagination
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            padding: "1rem",
+          }}
+          page={page}
+          setPage={setPage}
+          total={allData?.meta.total}
+          pageSize={allData?.meta.limit}
+        />
+      </div>
 
       {open && (
         <InvoiceModal
@@ -442,7 +480,10 @@ const AllInvoices = () => {
             {/* Weight Field */}
             <Col span={24}>
               <div>
-                <label htmlFor="weight" className="text-sm font-bold md:text-base">
+                <label
+                  htmlFor="weight"
+                  className="text-sm font-bold md:text-base"
+                >
                   Weight:
                 </label>
                 <input
@@ -462,7 +503,10 @@ const AllInvoices = () => {
             {/* Note Field */}
             <Col span={24}>
               <div>
-                <label htmlFor="note" className="text-sm font-bold md:text-base">
+                <label
+                  htmlFor="note"
+                  className="text-sm font-bold md:text-base"
+                >
                   Note:
                 </label>
                 <input
@@ -483,7 +527,6 @@ const AllInvoices = () => {
           </Row>
         </INVForm>
       </INVModal>
-
     </div>
   );
 };
