@@ -9,6 +9,7 @@ const INVModal = ({ title, open, setOpen, loading, children, ...rest }) => {
   return (
     <>
       <Modal
+     width={550}
         {...rest}
         open={open}
         title={title}
