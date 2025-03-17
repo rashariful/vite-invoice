@@ -342,7 +342,7 @@ const AllInvoices = () => {
   if (isLoading) {
     return <p>loading......</p>;
   }
-  console.log(selectedInvoice, "selected invoice");
+  // console.log(selectedInvoice, "selected invoice");
   const handleSendParcel = async () => {
     const data = {
       customerName: selectedInvoice.customerName,
@@ -368,17 +368,17 @@ const AllInvoices = () => {
           body: JSON.stringify(data),
         }
       );
-      console.log("Final Payload:", JSON.stringify(data));
+      // console.log("Final Payload:", JSON.stringify(data));
       if (!response.ok) throw new Error("Failed to send parcel");
       message.success("Parcel sent successfully!");
       setNote("");
       setWeight(null);
       setIsModalOpen(false);
-      console.log("Modal should close now, isModalOpen:", isModalOpen);
+      // console.log("Modal should close now, isModalOpen:", isModalOpen);
 
-      console.log("Parcel sent successfully!");
+      // console.log("Parcel sent successfully!");
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       message.error("Failed to send parcel, please try again.");
     }
   };
