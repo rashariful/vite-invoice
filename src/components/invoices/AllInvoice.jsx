@@ -20,11 +20,7 @@ import { shippingStatus } from "../../const/shippingStatus";
 import moment from "moment";
 import INVModal from "../UI/INVModal";
 import INVForm from "../form/INVForm";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  MoreOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, MoreOutlined } from "@ant-design/icons";
 // import INVSelect from "../form/INVSelect";
 import CommonButton from "../UI/CommonButton";
 import { useGetAllShopQuery } from "../../redux/api/shopApi";
@@ -42,7 +38,7 @@ const AllInvoices = () => {
   const [id, setId] = useState("");
   const [weight, setWeight] = useState(null);
   const [note, setNote] = useState("");
-  const [isInsideDhaka, setIsInsideDhaka] = useState(true);
+  const [isInsideDhaka, setIsInsideDhaka] = useState(1);
   const [selectedInvoice, setSelectedInvoice] = useState();
   // const searchQuery = [
   //   {
@@ -98,8 +94,6 @@ const AllInvoices = () => {
     skip: isShopLoading,
   });
 
-
-
   const allInvoiceData = allData?.data?.map((item) => {
     return {
       orderId: item?.orderId,
@@ -126,15 +120,21 @@ const AllInvoices = () => {
   const yesterday = moment().subtract(1, "days").startOf("day");
   const startOfWeek = moment().startOf("week");
   const startOfMonth = moment().startOf("month");
-  
-  const todayInvoices = allData?.data?.filter((invoice) => moment(invoice.createdAt).isSame(today, "day"));
-  const yesterdayInvoices =allData?.data?.filter((invoice) => moment(invoice.createdAt).isSame(yesterday, "day"));
-  const weeklyInvoices = allData?.data?.filter((invoice) => moment(invoice.createdAt).isSameOrAfter(startOfWeek, "day"));
-  const monthlyInvoices = allData?.data?.filter((invoice) => moment(invoice.createdAt).isSameOrAfter(startOfMonth, "day"));
-  
 
-  // fintering by date end here 
+  const todayInvoices = allData?.data?.filter((invoice) =>
+    moment(invoice.createdAt).isSame(today, "day")
+  );
+  const yesterdayInvoices = allData?.data?.filter((invoice) =>
+    moment(invoice.createdAt).isSame(yesterday, "day")
+  );
+  const weeklyInvoices = allData?.data?.filter((invoice) =>
+    moment(invoice.createdAt).isSameOrAfter(startOfWeek, "day")
+  );
+  const monthlyInvoices = allData?.data?.filter((invoice) =>
+    moment(invoice.createdAt).isSameOrAfter(startOfMonth, "day")
+  );
 
+  // fintering by date end here
 
   const [updateInvoice] = useUpdateInvoiceMutation();
 
@@ -304,6 +304,7 @@ const AllInvoices = () => {
                   key="ready"
                   onClick={(e) => {
                     e.domEvent.stopPropagation();
+                    setSelectedInvoice(record);
                     setId(record?._id);
                     setIsModalOpen(true);
                   }}
@@ -341,7 +342,7 @@ const AllInvoices = () => {
   if (isLoading) {
     return <p>loading......</p>;
   }
-
+  // console.log(selectedInvoice, "selected invoice");
   const handleSendParcel = async () => {
     const data = {
       customerName: selectedInvoice.customerName,
@@ -355,9 +356,9 @@ const AllInvoices = () => {
       cashCollection: selectedInvoice.due,
       weight,
       message: note,
-      isInsideDhaka,
+      delivery_type_id: isInsideDhaka,
     };
-    // console.log("handleSendParcel called", data);
+   
     try {
       const response = await fetch(
         "https://invoice-server.icchaporon.com/api/v1/parcels",
@@ -367,17 +368,17 @@ const AllInvoices = () => {
           body: JSON.stringify(data),
         }
       );
-      console.log("Final Payload:", JSON.stringify(data));
+      // console.log("Final Payload:", JSON.stringify(data));
       if (!response.ok) throw new Error("Failed to send parcel");
       message.success("Parcel sent successfully!");
       setNote("");
       setWeight(null);
       setIsModalOpen(false);
-      console.log("Modal should close now, isModalOpen:", isModalOpen);
+      // console.log("Modal should close now, isModalOpen:", isModalOpen);
 
-      console.log("Parcel sent successfully!");
+      // console.log("Parcel sent successfully!");
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       message.error("Failed to send parcel, please try again.");
     }
   };
@@ -463,14 +464,26 @@ const AllInvoices = () => {
             <Col span={24}>
               <div className="mb-4 flex gap-5">
                 <Button
-                  type={isInsideDhaka ? "primary" : "default"}
-                  onClick={() => setIsInsideDhaka(true)}
+                  type={isInsideDhaka === 1 ? "primary" : "default"}
+                  onClick={() => setIsInsideDhaka(1)}
+                >
+                  Express Delivery
+                </Button>
+                <Button
+                  type={isInsideDhaka === 2 ? "primary" : "default"}
+                  onClick={() => setIsInsideDhaka(2)}
                 >
                   Inside Dhaka
                 </Button>
                 <Button
-                  type={!isInsideDhaka ? "primary" : "default"}
-                  onClick={() => setIsInsideDhaka(false)}
+                  type={isInsideDhaka === 3 ? "primary" : "default"}
+                  onClick={() => setIsInsideDhaka(3)}
+                >
+                  Subcity
+                </Button>
+                <Button
+                  type={isInsideDhaka === 4 ? "primary" : "default"}
+                  onClick={() => setIsInsideDhaka(4)}
                 >
                   Outside Dhaka
                 </Button>
