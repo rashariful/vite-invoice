@@ -9,12 +9,14 @@ import { MdAddBusiness } from "react-icons/md";
 import { Layout, Menu, Button } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 const { Sider } = Layout;
 
 export function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   return (
     <Sider
@@ -47,14 +49,14 @@ export function DashboardSidebar() {
         <Menu.Item
           key="1"
           icon={<HomeOutlined />}
-          onClick={() => navigate("/invoices")}
+          onClick={() => navigate("/dashboard/invoices")}
         >
           Home
         </Menu.Item>
         <Menu.Item
           key="2"
           icon={<MdAddBusiness />}
-          onClick={() => navigate("/create-invoice")}
+          onClick={() => navigate("/dashboard/create-invoice")}
         >
           Create Invoices
         </Menu.Item>
@@ -64,11 +66,14 @@ export function DashboardSidebar() {
         <Menu.Item
           key="4"
           icon={<MdOutlineDriveFolderUpload />}
-          onClick={() => navigate("/invoice-upload")}
+          onClick={() => navigate("/dashboard/invoice-upload")}
         >
           invoice-upload
         </Menu.Item>
       </Menu>
+      <Button onClick={logout} type="primary" danger className="mt-4 !w-full">
+        Logout
+      </Button>
     </Sider>
   );
 }

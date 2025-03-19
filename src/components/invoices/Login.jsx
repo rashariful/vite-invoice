@@ -2,27 +2,23 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Card, Checkbox, Form, Input, message } from "antd";
 import { MailOutlined, LockOutlined, GithubOutlined, GoogleOutlined, UserOutlined } from "@ant-design/icons";
+import { useAuth } from "../../AuthContext";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (username === "admin@icchaporon.com" && password === "password") {
-      localStorage.setItem("user", JSON.stringify({ username }));
+  const onFinish = async (values) => {
+    setLoading(true);
+    const success = login(values.email, values.password);
+    if (success) {
       message.success("Login successful!");
-      navigate("/create-invoice");
+      navigate("/dashboard/invoices"); // ✅ Navigate only after successful login
     } else {
       message.error("Invalid credentials!");
     }
-  };
-
-  const onFinish = (values) => {
-    setUsername(values.email);
-    setPassword(values.password);
-    handleLogin();
-    console.log(values)
+    setLoading(false);
   };
 
   return (
