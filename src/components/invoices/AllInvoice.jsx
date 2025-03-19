@@ -9,7 +9,7 @@ import {
   Tag,
   Tooltip,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InvoiceModal from "../InvoiceModal";
 import {
   useGetAllInvoiceQuery,
@@ -28,6 +28,8 @@ import INVPagination from "../usableCompo/INVPagination";
 import { FaTruckPickup } from "react-icons/fa";
 import OrderManagement from "./OrderManagement";
 
+
+
 const AllInvoices = () => {
   const [open, setOpen] = useState(false);
   const [info, setInfo] = useState(null);
@@ -40,6 +42,8 @@ const AllInvoices = () => {
   const [note, setNote] = useState("");
   const [isInsideDhaka, setIsInsideDhaka] = useState(1);
   const [selectedInvoice, setSelectedInvoice] = useState();
+
+
   // const searchQuery = [
   //   {
   //     name: "limit",
@@ -64,8 +68,8 @@ const AllInvoices = () => {
   // }
 
   const searchQuery = [
-    { name: "limit", value: "10" },
-    { name: "page", value: page.toString() },
+    { name: "limit", value: "5000" },
+    // { name: "page", value: page.toString() },
   ];
   if (searchTerm) {
     searchQuery.push({ name: "searchTerm", value: searchTerm }); // Passing the search term to the query
@@ -82,9 +86,10 @@ const AllInvoices = () => {
       setActiveTab(key);
     }
   };
-
+  // fetch Shop data from redux api here 
   const { data: shopData, isLoading: isShopLoading } = useGetAllShopQuery();
 
+  // fetch invice data from redux api here 
   const {
     data: allData,
     isLoading,
@@ -93,8 +98,11 @@ const AllInvoices = () => {
   } = useGetAllInvoiceQuery(searchQuery, {
     skip: isShopLoading,
   });
+  const [filteredInvoices, setFilteredInvoices] = useState(allData?.data || []);
 
-  const allInvoiceData = allData?.data?.map((item) => {
+
+  // all invice data here 
+  const allInvoiceData = filteredInvoices?.map((item) => {
     return {
       orderId: item?.orderId,
       shop: item?.cashier_name
@@ -116,6 +124,7 @@ const AllInvoices = () => {
     };
   });
 
+  
   const today = moment().startOf("day");
   const yesterday = moment().subtract(1, "days").startOf("day");
   const startOfWeek = moment().startOf("week");
@@ -326,6 +335,11 @@ const AllInvoices = () => {
     },
   ];
 
+
+
+
+
+
   // Handle row click to open modal
   const onRowClick = (record, event) => {
     if (
@@ -339,10 +353,18 @@ const AllInvoices = () => {
 
   // column end here sharif
 
+  useEffect(() => {
+    // Set default data on first render
+    if (allData?.data) {
+      setFilteredInvoices(allData.data.slice(0, 10));
+    }
+  }, [allData]); // Runs only when `allData` updates
+
   if (isLoading) {
     return <p>loading......</p>;
   }
-  // console.log(selectedInvoice, "selected invoice");
+
+  // create parcel here 
   const handleSendParcel = async () => {
     const data = {
       customerName: selectedInvoice.customerName,
@@ -383,6 +405,33 @@ const AllInvoices = () => {
     }
   };
 
+
+  const handleFilterChange = (filterType) => {
+    let filteredData = allData?.data ?? [];
+  
+    if (filterType === "today") {
+      filteredData = filteredData.filter((invoice) =>
+        moment(invoice.createdAt).isSame(moment(), "day")
+      );
+    } else if (filterType === "yesterday") {
+      filteredData = filteredData.filter((invoice) =>
+        moment(invoice.createdAt).isSame(moment().subtract(1, "day"), "day")
+      );
+    } else if (filterType === "weekly") {
+      filteredData = filteredData.filter((invoice) =>
+        moment(invoice.createdAt).isSameOrAfter(moment().startOf("week"), "day")
+      );
+    } else if (filterType === "monthly") {
+      filteredData = filteredData.filter((invoice) =>
+        moment(invoice.createdAt).isSameOrAfter(moment().startOf("month"), "day")
+      );
+    }
+  
+    setFilteredInvoices(filteredData);
+  };
+  
+  
+  // console.log(filteredInvoices, "filteredInvoices");
   return (
     <div>
       <div className=" my-5 space-y-2">
@@ -396,13 +445,14 @@ const AllInvoices = () => {
           yesterdayInvoices={yesterdayInvoices}
           weeklyInvoices={weeklyInvoices}
           monthlyInvoices={monthlyInvoices}
+          handleFilterChange={handleFilterChange}
         />
       </div>
 
-      <div className="shadow-md p-4 bg-white rounded-lg">
+      {/* <div className="shadow-md p-4 bg-white rounded-lg">
         <Table
           columns={columns}
-          dataSource={allInvoiceData}
+          dataSource={allData?.data}
           onRow={(record) => ({
             onClick: (event) => onRowClick(record, event),
           })}
@@ -420,6 +470,19 @@ const AllInvoices = () => {
           total={allData?.meta.total}
           pageSize={allData?.meta.limit}
         />
+      </div> */}
+
+      <div className="shadow-md p-4 bg-white rounded-lg">
+      <Table
+       dataSource={allInvoiceData}
+        columns={columns}
+        //  rowKey={(record) => record.title} 
+         onRow={(record) => ({
+          onClick: (event) => onRowClick(record, event),
+        })}
+        rowClassName="cursor-pointer hover:bg-gray-100"
+         pagination={true} />;
+         
       </div>
 
       {open && (

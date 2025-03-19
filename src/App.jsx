@@ -5,46 +5,10 @@ import { DashboardSidebar } from "./SideBarDashboard";
 const { Content, Footer, Sider } = Layout;
 
 const App = () => {
-  // const {
-  //   token
-  //   : { colorBgContainer},
-  // } = theme.useToken();
+
   return (
     <Layout>
-      {/* <Sider breakpoint="lg" collapsedWidth="0">
-        <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["1"]}
-          items={[
-            {
-              key: "1",
-              icon: <FormOutlined />,
-              label: <Link to={"/"}>create invoice</Link>,
-              className: "hover:bg-[#93278f] focus-within:bg-[#93278f] active:bg-[#93278f]"
-            },
-            {
-              key: "2",
-              icon: <DatabaseOutlined />,
-              label: <Link to={"/invoices"}>Order Invoices</Link>,
-              className: "hover:bg-[#93278f] focus-within:bg-[#93278f] active:bg-[#93278f]"
-            },
-            {
-              key: "3",
-              icon: <DatabaseOutlined />,
-              label: <Link to={"/invoice-upload"}>invoice upload</Link>,
-              className: "hover:bg-[#93278f] focus-within:bg-[#93278f] active:bg-[#93278f]"
-            },
-            {
-              key: "4",
-              icon: <DatabaseOutlined />,
-              label: <Link to={"/shop"}>shop</Link>,
-              className: "hover:bg-[#93278f] focus-within:bg-[#93278f] active:bg-[#93278f]"
-            },
-          ]}
-        />
-      </Sider> */}
+     
       <DashboardSidebar/>
       <Layout>
         <Content

@@ -10,6 +10,7 @@ import AllInvoices from "./components/invoices/AllInvoice.jsx";
 import InvoiceFileUpload from "./components/InvoiceFileUpload.jsx";
 import { Toaster } from "react-hot-toast";
 import Shop from "./pages/Shop.jsx";
+import Login from "./components/invoices/Login.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element: <Login />,
+      },
+      {
+        path: "/create-invoice",
         element: <InvoiceForm />,
       },
       {
