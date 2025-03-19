@@ -54,7 +54,7 @@ export function DashboardSidebar() {
         <Menu.Item
           key="2"
           icon={<MdAddBusiness />}
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/create-invoice")}
         >
           Create Invoices
         </Menu.Item>

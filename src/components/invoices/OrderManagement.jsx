@@ -18,6 +18,7 @@ export default function OrderManagement({
   yesterdayInvoices,
   weeklyInvoices,
   monthlyInvoices,
+  handleFilterChange,
 }) {
   const data = allData;
   const orders = data?.data?.orders;
@@ -74,6 +75,7 @@ export default function OrderManagement({
             weeklyInvoices={weeklyInvoices}
             monthlyInvoices={monthlyInvoices}
             allData={allData}
+            handleFilterChange={handleFilterChange}
           />
         </div>
       </div>
