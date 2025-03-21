@@ -60,7 +60,7 @@ export function DashboardSidebar() {
         >
           Create Invoices
         </Menu.Item>
-        <Menu.Item key="3" icon={<BsShop />} onClick={() => navigate("/shop")}>
+        <Menu.Item key="3" icon={<BsShop />} onClick={() => navigate("/dashboard/shop")}>
           Shop
         </Menu.Item>
         <Menu.Item
