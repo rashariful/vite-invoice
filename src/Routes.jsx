@@ -7,10 +7,12 @@ import Shop from "./pages/Shop.jsx";
 import Login from "./components/invoices/Login.jsx";
 import DashboardLayout from "./components/dashboard/DashboardLayout.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import NotFound from "./NotFound.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    // element: <App />,
+    errorElement: <NotFound/>,
+
     children: [
       {
         path: "/",
