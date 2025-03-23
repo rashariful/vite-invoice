@@ -4,6 +4,7 @@ import InvoiceItem from "./InvoiceItem";
 import InvoiceModal from "./InvoiceModal";
 import { useGetAllInvoiceQuery } from "../redux/api/invoiceApi";
 import { useGetAllShopQuery } from "../redux/api/shopApi";
+import { message } from "antd";
 const date = new Date();
 const today = date.toLocaleDateString("en-GB", {
   month: "numeric",
@@ -135,6 +136,23 @@ const InvoiceForm = () => {
     : subTotal + deliveryCharge;
   const due = isNaN(paidAmount) ? grandTotal : grandTotal - paidAmount;
 
+  const [phoneError, setPhoneError] = useState("");
+
+const handlePhoneChange = (event) => {
+  const value = event.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+
+  if (value.length > 11) return; // Restrict to 11 digits
+
+  setCustomerContactNo(value);
+
+  // Validate phone number
+  if (value.length === 11) {
+    setPhoneError("");
+  } else {
+    setPhoneError("Phone number must be exactly 11 digits.");
+  }
+};
+
   if (isloading || allInvoiceLoading) {
     return <p>loading...</p>;
   }
@@ -242,9 +260,13 @@ const InvoiceForm = () => {
                 type="number"
                 name="customerName"
                 id="customerName"
+                // value={customerContactNo}
+                // onChange={(event) => setCustomerContactNo(event.target.value)}
                 value={customerContactNo}
-                onChange={(event) => setCustomerContactNo(event.target.value)}
+                onChange={handlePhoneChange}
+                maxLength="11"
               />
+              {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
             </div>
             <div>
               <label
