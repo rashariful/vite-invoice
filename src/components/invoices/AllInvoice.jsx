@@ -398,6 +398,7 @@ const AllInvoices = () => {
       setWeight(null);
       setIsModalOpen(false);
       // console.log("Modal should close now, isModalOpen:", isModalOpen);
+      refetchInvoice(); 
 
       // console.log("Parcel sent successfully!");
     } catch (error) {
