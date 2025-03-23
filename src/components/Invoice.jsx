@@ -2,7 +2,7 @@
 import Barcode from "react-barcode";
 
 const Invoice = ({ invoiceInfo, copy, date, items }) => {
-  console.log(invoiceInfo);
+  // console.log(invoiceInfo);
   return (
     <div>
       <div className="mx-5 grid grid-cols-3">
