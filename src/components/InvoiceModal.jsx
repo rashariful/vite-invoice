@@ -45,16 +45,16 @@ const InvoiceModal = ({
   const { refetch } = useGetAllInvoiceQuery();
   const addNextInvoiceHandler = async () => {
     try {
-      console.log(info);
+      // console.log(info);
       const response = await createInvoice(info);
-      console.log(response, "response");
+      // console.log(response, "response");
       if (response.data.success === true) {
         refetch();
         setIsOpen(false);
         onAddNextInvoice();
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 

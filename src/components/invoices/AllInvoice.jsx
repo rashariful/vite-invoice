@@ -378,9 +378,10 @@ const AllInvoices = () => {
       cashCollection: selectedInvoice.due,
       weight,
       message: note,
-      delivery_type_id: isInsideDhaka,
+      deliveryType: isInsideDhaka,
     };
-   
+    // console.log(data);
+  //  return
     try {
       const response = await fetch(
         "https://invoice-server.icchaporon.com/api/v1/parcels",

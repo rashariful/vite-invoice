@@ -16,14 +16,14 @@ const InvoiceFileUpload = () => {
 
   const handleFileUpload = async () => {
     if (!selectedFile) {
-      console.error("No file selected.");
+      // console.error("No file selected.");
       return;
     }
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
       const res = await createInvoiceWithXLSX(formData);
-      console.log(res);
+      // console.log(res);
 
       if (res.error) {
         toast.error("File upload failed!");
@@ -33,7 +33,7 @@ const InvoiceFileUpload = () => {
         setIsFileUploaded(true);
       }
     } catch (error) {
-      console.error("Error uploading file: ", error);
+      // console.error("Error uploading file: ", error);
       toast.error("File upload failed!");
     }
   };
